@@ -1,0 +1,44 @@
+name: Zbuduj APK na Androida
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Pobierz kod
+        uses: actions/checkout@v4
+
+      - name: Zainstaluj Java (potrzebna do Androida)
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Zainstaluj Flutter (baza dla Flet)
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.19.0'
+
+      - name: Zainstaluj Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Zainstaluj Flet i biblioteki
+        run: |
+          pip install flet
+          pip install -r requirements.txt
+
+      - name: Zbuduj plik APK
+        run: flet build apk --verbose
+
+      - name: Prześlij gotowy plik APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: MetamorfozaApp
+          path: build/apk/app-release.apk
