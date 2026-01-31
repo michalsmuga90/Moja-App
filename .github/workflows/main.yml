@@ -1,4 +1,4 @@
-name: Zbuduj APK na Androida
+name: Zbuduj APK na Androida (Naprawiony)
 
 on:
   push:
@@ -13,28 +13,35 @@ jobs:
       - name: Pobierz kod
         uses: actions/checkout@v4
 
-      - name: Zainstaluj Java (potrzebna do Androida)
+      # DIAGNOSTYKA: Pokaż jakie pliki są w folderze
+      - name: Sprawdź pliki (Debug)
+        run: ls -R
+
+      - name: Zainstaluj Java 17
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Zainstaluj Flutter (baza dla Flet)
+      - name: Zainstaluj Flutter
         uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.19.0'
 
-      - name: Zainstaluj Python
+      - name: Zainstaluj Python 3.11
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
-      - name: Zainstaluj Flet i biblioteki
+      - name: Zainstaluj biblioteki
+        # Tu wymuszamy instalację flet, nawet jak nie ma requirements.txt, dla pewności
         run: |
+          pip install --upgrade pip
           pip install flet
-          pip install -r requirements.txt
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
       - name: Zbuduj plik APK
+        # Dodajemy flagę --verbose żeby widzieć więcej błędów jak coś padnie
         run: flet build apk --verbose
 
       - name: Prześlij gotowy plik APK
