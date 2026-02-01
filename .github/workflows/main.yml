@@ -9,7 +9,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -25,21 +26,21 @@ jobs:
       - name: Install Flutter SDK
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.22.2' # Zalecana stabilna wersja dla Flet
+          channel: 'stable'
 
-      - name: Install dependencies
+      - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install flet
+          pip install flet flet-cli
 
       - name: Accept Android Licenses
         run: yes | flutter doctor --android-licenses
 
       - name: Build APK
         run: |
-          # Jeśli Twój plik nazywa się inaczej niż main.py, 
-          # zmień poniżej 'main.py' na nazwę swojego pliku (np. app.py)
-          flet build apk --module-name MojaApp --verbose
+          # Używamy yes | aby automatycznie potwierdzić instalację Flutter SDK przez Flet
+          # --module-name MojaApp wskazuje Twój główny plik
+          yes | flet build apk --module-name MojaApp --verbose
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
